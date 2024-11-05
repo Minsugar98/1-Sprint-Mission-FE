@@ -1,16 +1,16 @@
-import styles from "../styles/market.module.css";
-import { getProducts } from "./api/products";
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { Modal } from "../components/modal";
+import styles from '../styles/market.module.css';
+import { getProducts } from './api/products';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { Modal } from '../components/modal';
 export default function Market() {
   const [products, setProducts] = useState([]);
   const [bestProducts, setBestProducts] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [sortOrder, setSortOrder] = useState("최신순");
-  const [orderByField, setOrderByField] = useState("createdAt");
-  const [orderDir, setOrderDir] = useState("asc");
+  const [searchValue, setSearchValue] = useState('');
+  const [sortOrder, setSortOrder] = useState('최신순');
+  const [orderByField, setOrderByField] = useState('createdAt');
+  const [orderDir, setOrderDir] = useState('asc');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function Market() {
         setBestProducts(response);
         console.log(response);
       } catch (error) {
-        console.error("상품을 못 찾음", error);
+        console.error('상품을 못 찾음', error);
       }
     };
     fetchBestProducts();
@@ -44,7 +44,7 @@ export default function Market() {
         setProducts(response);
         console.log(response);
       } catch (error) {
-        console.error("상품을 못 찾음", error);
+        console.error('상품을 못 찾음', error);
       }
     };
     fetchProducts();
@@ -54,30 +54,30 @@ export default function Market() {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       const fetchProducts = async () => {
         try {
           const response = await getProducts({
             params: {
               page: 1,
               pageSize: 8,
-              orderBy: "recent",
+              orderBy: 'recent',
               keyword: searchValue,
             },
           });
           setProducts(response);
           console.log(response);
         } catch (error) {
-          console.error("상품을 못 찾음", error);
+          console.error('상품을 못 찾음', error);
         }
       };
       fetchProducts();
     }
-    console.log("Search value:", searchValue);
+    console.log('Search value:', searchValue);
   };
 
   const handleSelectChange = (e) => {
-    setSortOrder(e.target.getAttribute("data-value"));
+    setSortOrder(e.target.getAttribute('data-value'));
     setIsDropdownOpen(false);
   };
 
@@ -110,7 +110,7 @@ export default function Market() {
                   <p className={styles.marketName}>{bestProducts.name}</p>
                   <p className={styles.marketPrice}>{bestProducts.price} 원</p>
                   <p className={styles.marketPrice}>
-                    {"하트" + bestProducts.favoriteCount}
+                    {'하트' + bestProducts.favoriteCount}
                   </p>
                 </div>
               </div>
@@ -129,13 +129,13 @@ export default function Market() {
               />
               <img
                 className={styles.sellItemImg}
-                src={"./search.svg"}
+                src={'./search.svg'}
                 alt="검색 아이콘"
               />
               <button
                 className={styles.sellItemBtn}
                 onClick={() => {
-                  router.push("/items/createItem");
+                  router.push('/items/createItem');
                 }}
               >
                 상품 등록하기
@@ -153,9 +153,9 @@ export default function Market() {
                       className={styles.dropdownItem}
                       data-value="최신순"
                       onClick={() => {
-                        setSortOrder("최신순");
-                        setOrderByField("createdAt");
-                        setOrderDir("asc");
+                        setSortOrder('최신순');
+                        setOrderByField('createdAt');
+                        setOrderDir('asc');
                         setIsDropdownOpen(false);
                       }}
                     >
@@ -165,9 +165,9 @@ export default function Market() {
                       className={styles.dropdownItem}
                       data-value="좋아요순"
                       onClick={() => {
-                        setSortOrder("좋아요순");
-                        setOrderByField("favoriteCount");
-                        setOrderDir("desc");
+                        setSortOrder('좋아요순');
+                        setOrderByField('favoriteCount');
+                        setOrderDir('desc');
                         setIsDropdownOpen(false);
                       }}
                     >
@@ -197,7 +197,7 @@ export default function Market() {
                   <p className={styles.marketName}>{products.name}</p>
                   <p className={styles.marketPrice}>{products.price} 원</p>
                   <p className={styles.marketPrice}>
-                    {"하트" + products.favoriteCount}
+                    {'하트' + products.favoriteCount}
                   </p>
                 </div>
               </div>

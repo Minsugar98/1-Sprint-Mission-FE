@@ -1,9 +1,9 @@
-import Image from "next/image";
-import styles from "@/components/Header.module.css";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { getProfile } from "../pages/api/user";
+import Image from 'next/image';
+import styles from './Header.module.css';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { getProfile } from '../pages/api/user';
 export default function Header() {
   const [isLogin, setIsLogin] = useState(false);
   const [userData, setUserData] = useState({});
@@ -12,7 +12,7 @@ export default function Header() {
   useEffect(() => {
     // 비동기 함수 정의
     const fetchProfile = async () => {
-      const token = localStorage.getItem("accessToken");
+      const token = localStorage.getItem('accessToken');
       try {
         const profile = await getProfile(); // 비동기 함수 실행
         setUserData(profile); // 프로필 데이터를 저장
@@ -22,7 +22,7 @@ export default function Header() {
           setIsLogin(false); // 로그아웃 상태로 변경
         }
       } catch (error) {
-        console.error("개인 정보를 가져오는 중 오류 발생:", error);
+        console.error('개인 정보를 가져오는 중 오류 발생:', error);
       }
     };
 
@@ -38,14 +38,14 @@ export default function Header() {
           alt="logo"
           fill={true}
           className={styles.HeaderImg}
-          onClick={() => (window.location.href = "/")}
+          onClick={() => (window.location.href = '/')}
         />
       </div>
       <div className={styles.HeaderMenu}>
         <Link
           href="/articles"
           className={
-            router.pathname === "/articles" ? styles.Active : styles.NotActive
+            router.pathname === '/articles' ? styles.Active : styles.NotActive
           }
         >
           <p>자유 게시판</p>
@@ -53,7 +53,7 @@ export default function Header() {
         <Link
           href="/market"
           className={
-            router.pathname === "/market" ? styles.Active : styles.NotActive
+            router.pathname === '/market' ? styles.Active : styles.NotActive
           }
         >
           <p>중고마켓</p>
@@ -62,7 +62,7 @@ export default function Header() {
       {!isLogin ? (
         <button
           className={styles.HeaderBtn}
-          onClick={() => router.push("/login")}
+          onClick={() => router.push('/login')}
         >
           로그인
         </button>

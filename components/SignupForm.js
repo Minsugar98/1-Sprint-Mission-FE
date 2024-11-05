@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import useForm from "../hook/form";
-import styles from "./SignupForm.module.css";
-import Image from "next/image";
-import { PostSignup } from "../pages/api/user.js";
+import React, { useState } from 'react';
+import useForm from '../hook/form';
+import styles from './SignupForm.module.css';
+import Image from 'next/image';
+import { PostSignup } from '../pages/api/user';
 
 const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
   const { values, handleChange, handleSubmit, resetForm, isSubmitting } =
     useForm({
-      email: "",
-      nickname: "",
-      password: "",
-      password2: "",
+      email: '',
+      nickname: '',
+      password: '',
+      password2: '',
     });
 
   const [errors, setErrors] = useState({});
@@ -27,26 +27,26 @@ const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
     let validationErrors = {};
 
     if (!values.email) {
-      validationErrors.email = "이메일을 입력해주세요.";
+      validationErrors.email = '이메일을 입력해주세요.';
     } else if (!/\S+@\S+\.\S+/.test(values.email)) {
-      validationErrors.email = "잘못된 이메일입니다.";
+      validationErrors.email = '잘못된 이메일입니다.';
     }
 
     if (!values.password) {
-      validationErrors.password = "비밀번호를 입력해주세요.";
+      validationErrors.password = '비밀번호를 입력해주세요.';
     } else if (values.password.length < 8) {
-      validationErrors.password = "비밀번호를 8자 이상 입력해주세요.";
+      validationErrors.password = '비밀번호를 8자 이상 입력해주세요.';
     }
     if (values.password !== values.password2) {
-      validationErrors.password2 = "비밀번호를 입력해주세요.";
+      validationErrors.password2 = '비밀번호를 입력해주세요.';
     } else if (!values.password2) {
-      validationErrors.password2 = "비밀번호가 일치하지 않습니다.";
+      validationErrors.password2 = '비밀번호가 일치하지 않습니다.';
     }
 
     if (!values.nickname) {
-      validationErrors.nickname = "닉네임을 입력해주세요.";
+      validationErrors.nickname = '닉네임을 입력해주세요.';
     } else if (values.nickname.length < 2) {
-      validationErrors.nickname = "닉네임 2글자 이상 입력해주세요.";
+      validationErrors.nickname = '닉네임 2글자 이상 입력해주세요.';
     }
 
     return validationErrors;
@@ -66,14 +66,14 @@ const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
         });
         if (res && res.status === 201) {
           resetForm();
-          console.log("회원가입 성공", res.data);
+          console.log('회원가입 성공', res.data);
         } else {
-          console.log("회원가입 실패", res.data);
+          console.log('회원가입 실패', res.data);
           setIsModalOpen(true);
         }
       } catch (e) {
         setIsModalOpen(true);
-        console.log("에러", e);
+        console.log('에러', e);
       }
     }
   };
@@ -105,7 +105,7 @@ const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
       <div className={styles.formGroup}>
         <label className={styles.label}>비밀번호</label>
         <input
-          type={showpassword1 ? "text" : "password"}
+          type={showpassword1 ? 'text' : 'password'}
           name="password"
           value={values.password}
           onChange={handleChange}
@@ -127,7 +127,7 @@ const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
       <div className={styles.formGroup}>
         <label className={styles.label}>비밀번호 확인</label>
         <input
-          type={showpassword2 ? "text" : "password"}
+          type={showpassword2 ? 'text' : 'password'}
           name="password2"
           value={values.password2}
           onChange={handleChange}

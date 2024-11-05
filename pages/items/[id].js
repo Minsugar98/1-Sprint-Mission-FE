@@ -1,23 +1,23 @@
-import styles from "./id.module.css";
-import Image from "next/image";
+import styles from './id.module.css';
+import Image from 'next/image';
 import {
   getProduct,
   deleteProduct,
   patchProduct,
   postfavorite,
-} from "../api/products";
-import { useEffect, useState } from "react";
+} from '../api/products.ts';
+import { useEffect, useState } from 'react';
 import {
   getComments,
   postComment,
   patchComment,
   deleteComment,
-} from "../api/comments";
+} from '../api/comments';
 // import { getProfile } from "../api/user";
-import { useRouter } from "next/router";
-import { Modal } from "../../components/modal";
-import useForm from "@/hook/form";
-import { getTimeDifference } from "@/utill/utill";
+import { useRouter } from 'next/router';
+import { Modal } from '../../components/modal';
+import useForm from '@/hook/form';
+import { getTimeDifference } from '@/utill/utill';
 export async function getServerSideProps(path) {
   const { id } = path.params;
   return {
@@ -29,11 +29,11 @@ export async function getServerSideProps(path) {
 export default function Market({ id }) {
   const { values, handleChange, handleSubmit, resetForm, isSubmitting } =
     useForm({
-      name: "",
-      description: "",
-      price: "",
-      tags: "",
-      content: "",
+      name: '',
+      description: '',
+      price: '',
+      tags: '',
+      content: '',
     });
   const [product, setProduct] = useState([]);
   const [comment, setComment] = useState([]);
@@ -57,7 +57,7 @@ export default function Market({ id }) {
         // const profile = await getProfile(); // 비동기 함수 호출
         // setUserData(profile); // 프로필 데이터를 상태로 저장
       } catch (error) {
-        console.error("제품 정보를 가져오는 중 오류 발생:", error);
+        console.error('제품 정보를 가져오는 중 오류 발생:', error);
       }
     };
 
@@ -71,7 +71,7 @@ export default function Market({ id }) {
         // console.log(response);
         setComment(response); // API 호출 후 데이터의 data 부분만 상태로 저장
       } catch (error) {
-        console.error("댓글 오류", error);
+        console.error('댓글 오류', error);
       }
     };
 
@@ -98,11 +98,11 @@ export default function Market({ id }) {
       });
       if (res && res.status === 200) {
         resetForm();
-        console.log("수정 성공", res.data);
+        console.log('수정 성공', res.data);
         router.reload();
         setIsCommentsModalOpen(false);
       } else {
-        console.log("수정 실패", res.data);
+        console.log('수정 실패', res.data);
       }
     } catch (e) {
       console.log(e);
@@ -120,14 +120,14 @@ export default function Market({ id }) {
       if (res && res.status === 200) {
         setIsProductModalOpen(false);
         setCheckModal(true);
-        console.log("수정 성공", res.data);
+        console.log('수정 성공', res.data);
         resetForm();
         router.reload();
       } else {
-        console.log("수정 실패", res.data);
+        console.log('수정 실패', res.data);
       }
     } catch (e) {
-      console.log("에러", e);
+      console.log('에러', e);
     }
   };
   const handleCommentToggle = (index) => {
@@ -202,20 +202,20 @@ export default function Market({ id }) {
       >
         <p>정말 삭제 하시겠습니까!!?</p>
         <button
-          style={{ width: "50%", height: "50px" }}
+          style={{ width: '50%', height: '50px' }}
           onClick={async () => {
             try {
               await deleteProduct(id);
-              router.push("/market");
+              router.push('/market');
             } catch (error) {
-              console.error("제품 삭제 오류", error);
+              console.error('제품 삭제 오류', error);
             }
           }}
         >
           확인
         </button>
         <button
-          style={{ width: "50%", height: "50px" }}
+          style={{ width: '50%', height: '50px' }}
           onClick={() => setIsProductDeleteModalOpen(!isProductDeleteModalOpen)}
         >
           취소
@@ -258,7 +258,7 @@ export default function Market({ id }) {
               )}
             </div>
             <div className={styles.marketPrice}>
-              {parseInt(product.price).toLocaleString() + "원"}
+              {parseInt(product.price).toLocaleString() + '원'}
             </div>
             <div className={styles.marketContentName}>상품 소개</div>
             <div className={styles.marketContent}>{product.description}</div>
@@ -292,7 +292,7 @@ export default function Market({ id }) {
                   // router.reload();
                 }}
               >
-                {"♡" + product.favoriteCount}
+                {'♡' + product.favoriteCount}
               </button>
             </div>
           </div>
@@ -320,7 +320,7 @@ export default function Market({ id }) {
                 <div className={styles.marketArticleContent}>
                   <p className={styles.marketArticleContentTitle}>
                     {comment.content}
-                  </p>{" "}
+                  </p>{' '}
                   <Image
                     onClick={() => handleCommentToggle(index)}
                     src="/kebab-btn.svg"
@@ -352,15 +352,15 @@ export default function Market({ id }) {
                 </div>
                 <div className={styles.marketArticleProfileContainer}>
                   <div>
-                    <Image src="/MyImg.svg" width={40} height={40} />{" "}
+                    <Image src="/MyImg.svg" width={40} height={40} />{' '}
                   </div>
                   <div className={styles.marketArticleProfileInfo}>
                     <p className={styles.marketArticleProfileName}>
                       {comment.user.nickName}
-                    </p>{" "}
+                    </p>{' '}
                     <p className={styles.marketArticleProfileDate}>
                       {getTimeDifference(comment.updatedAt)}
-                    </p>{" "}
+                    </p>{' '}
                   </div>
                 </div>
               </div>

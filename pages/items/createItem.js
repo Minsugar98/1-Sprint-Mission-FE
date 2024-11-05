@@ -1,8 +1,8 @@
-import styles from "./createItem.module.css";
-import Image from "next/image";
-import useForm from "../../hook/form";
-import { useState, useEffect } from "react";
-import { postProduct } from "../api/products";
+import styles from './createItem.module.css';
+import Image from 'next/image';
+import useForm from '../../hook/form';
+import { useState, useEffect } from 'react';
+import { postProduct } from '../api/products';
 
 export default function CreateItem() {
   const {
@@ -13,16 +13,16 @@ export default function CreateItem() {
     setValues,
     isSubmitting,
   } = useForm({
-    name: "",
+    name: '',
     price: 0,
     images: [],
     tags: [],
-    description: "",
+    description: '',
   });
 
   const [selectedImages, setSelectedImages] = useState([]);
   const [tags, setTags] = useState([]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [errors, setErrors] = useState({});
 
   const generateUUID = () => {
@@ -32,7 +32,7 @@ export default function CreateItem() {
     const files = Array.from(event.target.files);
 
     if (selectedImages.length + files.length > 3) {
-      alert("이미지는 최대 3개까지 등록할 수 있습니다.");
+      alert('이미지는 최대 3개까지 등록할 수 있습니다.');
       return;
     }
 
@@ -74,7 +74,7 @@ export default function CreateItem() {
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter" && inputValue.trim() !== "") {
+    if (event.key === 'Enter' && inputValue.trim() !== '') {
       event.preventDefault();
       if (tags.length < 3) {
         const newTag = { id: generateUUID(), text: inputValue.trim() };
@@ -93,10 +93,10 @@ export default function CreateItem() {
           return updatedTags;
         });
 
-        setInputValue("");
+        setInputValue('');
       } else {
-        setInputValue("");
-        alert("태그는 최대 3개까지만 추가할 수 있습니다.");
+        setInputValue('');
+        alert('태그는 최대 3개까지만 추가할 수 있습니다.');
       }
     }
   };
@@ -110,26 +110,26 @@ export default function CreateItem() {
     let validationErrors = {};
 
     if (!values.name) {
-      validationErrors.name = "상품 이름을 입력해주세요.";
+      validationErrors.name = '상품 이름을 입력해주세요.';
     } else if (values.name.length < 2) {
-      validationErrors.name = "상품 이름 2글자 이상 입력해주세요.";
+      validationErrors.name = '상품 이름 2글자 이상 입력해주세요.';
     }
 
     if (!values.description) {
-      validationErrors.description = "상품 description 입력해주세요.";
+      validationErrors.description = '상품 description 입력해주세요.';
     } else if (values.description.length < 2) {
       validationErrors.description =
-        "상품 description 2글자 이상 입력해주세요.";
+        '상품 description 2글자 이상 입력해주세요.';
     }
 
     if (!values.price) {
-      validationErrors.price = "가격을 입력해주세요.";
+      validationErrors.price = '가격을 입력해주세요.';
     } else if (values.price < 0) {
-      validationErrors.price = "가격가 0이다면 됩니다.";
+      validationErrors.price = '가격가 0이다면 됩니다.';
     }
 
     if (selectedImages.length < 1) {
-      validationErrors.images = "이미지를 입력해주세요.";
+      validationErrors.images = '이미지를 입력해주세요.';
     }
 
     return validationErrors;
@@ -152,14 +152,14 @@ export default function CreateItem() {
         });
         if (res && res.status === 201) {
           resetForm();
-          console.log("상품 등록 성공", res.data);
+          console.log('상품 등록 성공', res.data);
         } else {
-          console.log("상품 등록 성공", res.data);
+          console.log('상품 등록 성공', res.data);
           // setIsModalOpen(true);
         }
       } catch (e) {
         // setIsModalOpen(true);
-        console.log("에러", e);
+        console.log('에러', e);
       }
     } else {
       console.log(validationErrors);
@@ -172,7 +172,7 @@ export default function CreateItem() {
           className={styles.form}
           onKeyDown={(e) => {
             // Enter 키가 눌렸을 때 폼이 제출되지 않도록 기본 동작 막기
-            if (e.key === "Enter") {
+            if (e.key === 'Enter') {
               e.preventDefault();
             }
           }}

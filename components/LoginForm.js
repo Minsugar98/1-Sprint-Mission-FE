@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import useForm from "../hook/form";
-import styles from "./LoginForm.module.css";
-import Image from "next/image";
-import { PostLogin } from "../pages/api/user.js";
-import { useRouter } from "next/router";
+import React, { useState } from 'react';
+import useForm from '../hook/form';
+import styles from './LoginForm.module.css';
+import Image from 'next/image';
+import { PostLogin } from '../pages/api/user';
+import { useRouter } from 'next/router';
 
 const LoginForm = () => {
   const { values, handleChange, handleSubmit, resetForm, isSubmitting } =
     useForm({
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     });
 
   const router = useRouter();
@@ -25,15 +25,15 @@ const LoginForm = () => {
     let validationErrors = {};
 
     if (!values.email) {
-      validationErrors.email = "이메일을 입력해주세요.";
+      validationErrors.email = '이메일을 입력해주세요.';
     } else if (!/\S+@\S+\.\S+/.test(values.email)) {
-      validationErrors.email = "잘못된 이메일입니다.";
+      validationErrors.email = '잘못된 이메일입니다.';
     }
 
     if (!values.password) {
-      validationErrors.password = "비밀번호를 입력해주세요.";
+      validationErrors.password = '비밀번호를 입력해주세요.';
     } else if (values.password.length < 8) {
-      validationErrors.password = "비밀번호를 8자 이상 입력해주세요.";
+      validationErrors.password = '비밀번호를 8자 이상 입력해주세요.';
     }
 
     return validationErrors;
@@ -54,15 +54,15 @@ const LoginForm = () => {
 
         if (res && res.status === 200) {
           resetForm(); // 폼 리셋
-          console.log("로그인 성공", res.data);
-          localStorage.setItem("accessToken", res.data.accessToken);
-          localStorage.setItem("refreshToken", res.data.refreshToken);
-          router.push("/market");
+          console.log('로그인 성공', res.data);
+          localStorage.setItem('accessToken', res.data.accessToken);
+          localStorage.setItem('refreshToken', res.data.refreshToken);
+          router.push('/market');
         } else {
-          console.log("로그인실패", res.data);
+          console.log('로그인실패', res.data);
         }
       } catch (e) {
-        console.log("에러", e);
+        console.log('에러', e);
       }
     }
   };
@@ -83,7 +83,7 @@ const LoginForm = () => {
       <div className={styles.formGroup}>
         <label className={styles.label}>비밀번호</label>
         <input
-          type={showpassword ? "text" : "password"}
+          type={showpassword ? 'text' : 'password'}
           name="password"
           value={values.password}
           onChange={handleChange}

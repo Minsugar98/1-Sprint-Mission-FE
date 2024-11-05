@@ -1,8 +1,8 @@
-import styles from "@/styles/login.module.css";
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import LoginForm from "../components/LoginForm.js";
-import { useRouter } from "next/router";
+import styles from '../styles/login.module.css';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import LoginForm from '../components/LoginForm.js';
+import { useRouter } from 'next/router';
 export default function Login() {
   const [isLogin, setIsLogin] = useState(false);
   const router = useRouter();
@@ -10,7 +10,7 @@ export default function Login() {
   useEffect(() => {
     // 비동기 함수 정의
     const fetchProfile = async () => {
-      const token = localStorage.getItem("accessToken");
+      const token = localStorage.getItem('accessToken');
       if (token && token.length > 0) {
         setIsLogin(true); // 로그인 상태로 변경
       } else {
@@ -53,12 +53,13 @@ export default function Login() {
               </div>
             </div>
             <p className={styles.fromFooter}>
-              판다마켓이 처음이신가요? <a href="/signup">회원가입</a>
+              판다마켓이 처음이신가요?{' '}
+              <a onClick={() => router.push('/signup')}>회원가입</a>
             </p>
           </div>
         </div>
       ) : (
-        router.push("/folder")
+        router.push('/folder')
       )}
     </>
   );

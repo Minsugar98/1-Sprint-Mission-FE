@@ -1,11 +1,13 @@
-import styles from "@/styles/signup.module.css";
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import { PostSignup } from "./api/user";
-import SignupForm from "../components/SignupForm.js";
-import { Modal } from "../components/modal";
+import styles from '../styles/signup.module.css';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { PostSignup } from './api/user';
+import SignupForm from '../components/SignupForm.js';
+import { Modal } from '../components/modal';
+import { useRouter } from 'next/router';
 
 export default function Signup() {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <>
@@ -38,7 +40,8 @@ export default function Signup() {
             </div>
           </div>
           <p className={styles.formfooter}>
-            이미 회원이신가요? <a href="/">로그인</a>
+            이미 회원이신가요?{' '}
+            <a onClick={() => router.push('/login')}>로그인</a>
           </p>
         </div>
       </div>
