@@ -17,6 +17,8 @@ export interface Product {
   favoriteCount: number;
   createdAt: string;
   updatedAt: string;
+  tags: string[];
+  ownerNickname: string;
   // 다른 필요한 필드들이 있으면 추가 가능
 }
 
@@ -24,8 +26,8 @@ export interface Product {
 export interface GetProductsParams {
   page?: number;
   pageSize?: number;
-  orderBy?: string;
-  orderDir?: 'asc' | 'desc';
+  orderByField?: string;
+  orderDir?: string;
   keyword?: string;
 }
 
@@ -35,6 +37,7 @@ export interface PostProductData {
   description: string;
   price: number;
   images: string[];
+  tags?: string[];
 }
 
 // 제품 수정 시 보낼 데이터 타입
@@ -43,4 +46,5 @@ export interface PatchProductData {
   description?: string;
   price?: number;
   images?: string[];
+  tags?: string[];
 }

@@ -9,13 +9,20 @@ export interface Comment {
 
 export interface Article {
   id: string;
-  title: string;
+  name: string; // `title`에서 `name`으로 변경됨
+  userId: string; // `authorId`에서 `userId`로 변경됨
   content: string;
-  authorId: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   favoriteCount: number;
-  comments?: Comment[];
+  images: string[];
+  comment: Comment[]; // `comments`에서 `comment`로 변경됨
+}
+
+export interface PostArticleData {
+  name: string;
+  content: string;
+  images: string[];
 }
 
 export interface ErrorResponse {

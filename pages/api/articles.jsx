@@ -54,12 +54,12 @@ function getArticles(data) {
         }
     });
 }
-function getArticleId(articleId, data) {
+function getArticleId(articleId, pageSize) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
         try {
             const response = yield api.get(`/articles/${articleId}`, {
-                params: data,
+                params: pageSize,
             });
             return response;
         }

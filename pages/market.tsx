@@ -3,70 +3,92 @@ import { getProducts } from './api/products';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { Modal } from '../components/modal';
+import { Product } from './api/types/productTypes'; // Product 타입을 임포트해야 합니다.
+import { AxiosResponse } from 'axios';
+
+export function isAxiosResponse<T>(
+  response: any
+): response is AxiosResponse<T> {
+  return (
+    response && response.status !== undefined && response.data !== undefined
+  );
+}
+
 export default function Market() {
-  const [products, setProducts] = useState([]);
-  const [bestProducts, setBestProducts] = useState([]);
-  const [searchValue, setSearchValue] = useState('');
-  const [sortOrder, setSortOrder] = useState('최신순');
-  const [orderByField, setOrderByField] = useState('createdAt');
-  const [orderDir, setOrderDir] = useState('asc');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [bestProducts, setBestProducts] = useState<Product[]>([]);
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<string>('최신순');
+  const [orderByField, setOrderByField] = useState<string>('createdAt');
+  const [orderDir, setOrderDir] = useState<string>('asc');
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const router = useRouter();
+
   useEffect(() => {
     const fetchBestProducts = async () => {
       try {
         const response = await getProducts({
-          params: {
-            page: 1,
-            pageSize: 4,
-          },
+          page: 1,
+          pageSize: 4,
         });
-        setBestProducts(response);
-        console.log(response);
+
+        if (isAxiosResponse(response)) {
+          setBestProducts(response.data.products);
+          console.log(response);
+        } else {
+          console.error('상품을 찾지 못했습니다.', response);
+        }
       } catch (error) {
         console.error('상품을 못 찾음', error);
       }
     };
     fetchBestProducts();
   }, []);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await getProducts({
-          params: {
-            page: 1,
-            pageSize: 8,
-            orderDir: orderDir,
-            orderByField: orderByField,
-          },
+          page: 1,
+          pageSize: 8,
+          orderDir: orderDir,
+          orderByField: orderByField,
         });
-        setProducts(response);
-        console.log(response);
+
+        if (isAxiosResponse(response)) {
+          setProducts(response.data.products);
+          console.log(response);
+        } else {
+          console.error('상품을 찾지 못했습니다.', response);
+        }
       } catch (error) {
         console.error('상품을 못 찾음', error);
       }
     };
     fetchProducts();
-  }, [sortOrder]);
-  const handleInputChange = (e) => {
+  }, [sortOrder, orderByField, orderDir]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       const fetchProducts = async () => {
         try {
           const response = await getProducts({
-            params: {
-              page: 1,
-              pageSize: 8,
-              orderBy: 'recent',
-              keyword: searchValue,
-            },
+            page: 1,
+            pageSize: 8,
+            orderByField: 'createdAt',
+            keyword: searchValue,
           });
-          setProducts(response);
-          console.log(response);
+
+          if (isAxiosResponse(response)) {
+            setProducts(response.data.products);
+            console.log(response);
+          } else {
+            console.error('상품을 찾지 못했습니다.', response);
+          }
         } catch (error) {
           console.error('상품을 못 찾음', error);
         }
@@ -76,14 +98,18 @@ export default function Market() {
     console.log('Search value:', searchValue);
   };
 
-  const handleSelectChange = (e) => {
-    setSortOrder(e.target.getAttribute('data-value'));
-    setIsDropdownOpen(false);
+  const handleSelectChange = (e: React.MouseEvent<HTMLDivElement>) => {
+    const value = e.currentTarget.getAttribute('data-value');
+    if (value) {
+      setSortOrder(value);
+      setIsDropdownOpen(false);
+    }
   };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
   return (
     <>
       <div className={styles.marketContainer}>
@@ -92,25 +118,25 @@ export default function Market() {
             <p className={styles.marketTitleText}>베스트 상품</p>
           </div>
           <div className={styles.marketList}>
-            {bestProducts.map((bestProducts) => (
+            {bestProducts.map((bestProduct) => (
               <div
-                onClick={() => router.push(`/items/${bestProducts.id}`)}
+                onClick={() => router.push(`/items/${bestProduct.id}`)}
                 className={styles.marketItem}
-                key={bestProducts.id}
+                key={bestProduct.id}
               >
                 <div className={styles.marketImg}>
                   <Image
-                    src={bestProducts.images[0]}
+                    src={bestProduct.images[0]}
                     alt="product"
                     width={200}
                     height={200}
                   />
                 </div>
                 <div className={styles.marketInfo}>
-                  <p className={styles.marketName}>{bestProducts.name}</p>
-                  <p className={styles.marketPrice}>{bestProducts.price} 원</p>
+                  <p className={styles.marketName}>{bestProduct.name}</p>
+                  <p className={styles.marketPrice}>{bestProduct.price} 원</p>
                   <p className={styles.marketPrice}>
-                    {'하트' + bestProducts.favoriteCount}
+                    {'하트' + bestProduct.favoriteCount}
                   </p>
                 </div>
               </div>
@@ -127,10 +153,12 @@ export default function Market() {
                 className={styles.sellItemInput}
                 placeholder="검색할 상품을 입력해주세요"
               />
-              <img
+              <Image
                 className={styles.sellItemImg}
-                src={'./search.svg'}
+                src={'/search.svg'}
                 alt="검색 아이콘"
+                width={24}
+                height={24}
               />
               <button
                 className={styles.sellItemBtn}
@@ -179,25 +207,25 @@ export default function Market() {
             </div>
           </div>
           <div className={styles.marketList}>
-            {products.map((products) => (
+            {products.map((product) => (
               <div
-                onClick={() => router.push(`/items/${products.id}`)}
+                onClick={() => router.push(`/items/${product.id}`)}
                 className={styles.marketItem}
-                key={products.id}
+                key={product.id}
               >
                 <div className={styles.marketImg}>
                   <Image
-                    src={products.images[0]}
+                    src={product.images[0]}
                     alt="product"
                     width={200}
                     height={200}
                   />
                 </div>
                 <div className={styles.marketInfo}>
-                  <p className={styles.marketName}>{products.name}</p>
-                  <p className={styles.marketPrice}>{products.price} 원</p>
+                  <p className={styles.marketName}>{product.name}</p>
+                  <p className={styles.marketPrice}>{product.price} 원</p>
                   <p className={styles.marketPrice}>
-                    {'하트' + products.favoriteCount}
+                    {'하트' + product.favoriteCount}
                   </p>
                 </div>
               </div>

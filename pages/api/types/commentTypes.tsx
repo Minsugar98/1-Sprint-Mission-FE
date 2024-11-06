@@ -13,6 +13,7 @@ export interface Comment {
   productId: string;
   articleId?: string; // Article ID는 게시글 댓글에만 해당
   userId: string;
+  nickname: string;
   content: string;
   createdAt: string;
   updatedAt: string;

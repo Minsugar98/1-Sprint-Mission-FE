@@ -2,20 +2,29 @@ import styles from './create.module.css';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { postArticle } from '../api/articles';
-export default function create() {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [btnState, setbtnState] = useState('addpostBtnfalse');
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [imagesUrl, setImagesUrl] = useState([]);
+
+interface SelectedImage {
+  id: string;
+  url: string | ArrayBuffer | null;
+}
+
+export default function Create() {
+  const [title, setTitle] = useState<string>('');
+  const [content, setContent] = useState<string>('');
+  const [btnState, setBtnState] = useState<string>('addpostBtnfalse');
+  const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
+  const [imagesUrl, setImagesUrl] = useState<string[]>([]);
 
   const router = useRouter();
 
-  const generateUUID = () => {
+  const generateUUID = (): string => {
     return Math.random().toString(36).substring(2, 9);
   };
-  const handleImageChange = (event) => {
-    const files = Array.from(event.target.files);
+
+  const handleImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const files = event.target.files ? Array.from(event.target.files) : [];
 
     if (selectedImages.length + files.length > 3) {
       alert('이미지는 최대 3개까지 등록할 수 있습니다.');
@@ -23,7 +32,7 @@ export default function create() {
     }
 
     const newImagesPromises = files.map((file) => {
-      return new Promise((resolve) => {
+      return new Promise<SelectedImage>((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () =>
           resolve({ id: generateUUID(), url: reader.result });
@@ -34,55 +43,61 @@ export default function create() {
     Promise.all(newImagesPromises).then((loadedImages) => {
       setSelectedImages((prevImages) => {
         const updatedImages = [...prevImages, ...loadedImages].slice(0, 3);
-        // console.log("업데이트된 이미지 리스트:", updatedImages);
-
-        const imageUrls = updatedImages.map((image) => image.url);
-        // images 값을 포함한 values 업데이트
+        const imageUrls = updatedImages.map((image) => image.url as string);
         setImagesUrl(imageUrls);
-
         return updatedImages;
       });
     });
   };
-  const handleRemoveImage = (id) => {
+
+  const handleRemoveImage = (id: string): void => {
     setSelectedImages((prevImages) => {
-      // console.log(id);
       const updatedImages = prevImages.filter((image) => image.id !== id);
+      setImagesUrl(updatedImages.map((image) => image.url as string));
       return updatedImages;
     });
   };
 
-  const handleTitleChange = (event) => {
+  const handleTitleChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     setTitle(event.target.value);
   };
-  const handleContentChange = (event) => {
+
+  const handleContentChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ): void => {
     setContent(event.target.value);
   };
 
   useEffect(() => {
     if (title.length > 0 && content.length > 0) {
-      setbtnState('addpostBtntrue');
+      setBtnState('addpostBtntrue');
     } else {
-      setbtnState('addpostBtnfalse');
+      setBtnState('addpostBtnfalse');
     }
   }, [title, content]);
 
-  const postClick = async (e) => {
+  const postClick = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
     const data = {
       name: title,
       content: content,
       images: imagesUrl,
+      userId: localStorage.getItem('userId'),
+      favoriteCount: 0,
+      comment: [],
     };
-    console.log(data);
+
     try {
       await postArticle(data);
       // router.push(`/`);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
+
   return (
     <>
       <div className={styles.addpostContainer}>
@@ -125,7 +140,7 @@ export default function create() {
                     {selectedImages.map((image) => (
                       <div key={image.id} className={styles.imagePreview}>
                         <img
-                          src={image.url}
+                          src={image.url as string}
                           alt="미리보기"
                           className={styles.previewImage}
                         />
@@ -147,7 +162,7 @@ export default function create() {
                 onChange={handleTitleChange}
                 className={styles.InputTitle}
                 type="text"
-                placeholder="제목을 입력해주세요"
+                placeholder="제목을 입력해주세요"
               />
             </div>
             <div className={styles.formContent}>
@@ -155,8 +170,7 @@ export default function create() {
               <textarea
                 onChange={handleContentChange}
                 className={styles.InputContent}
-                type="text"
-                placeholder="내용을 입력해주세요"
+                placeholder="내용을 입력해주세요"
               />
             </div>
           </div>

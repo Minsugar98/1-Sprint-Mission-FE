@@ -16,9 +16,17 @@ import {
 // import { getProfile } from "../api/user";
 import { useRouter } from 'next/router';
 import { Modal } from '../../components/modal';
-import useForm from '@/hook/form';
-import { getTimeDifference } from '@/utill/utill';
-export async function getServerSideProps(path) {
+import useForm from '../../hook/form';
+import { getTimeDifference } from '../../utill/utill';
+import { AxiosResponse, isAxiosError } from 'axios';
+import { Product, ErrorResponse } from '../../pages/api/types/productTypes';
+import { Comment } from '../../pages/api/types/commentTypes';
+
+interface MarketProps {
+  id: string;
+}
+
+export async function getServerSideProps(path: { params: { id: string } }) {
   const { id } = path.params;
   return {
     props: {
@@ -26,7 +34,12 @@ export async function getServerSideProps(path) {
     },
   };
 }
-export default function Market({ id }) {
+
+function isAxiosResponse<T>(response: any): response is AxiosResponse<T> {
+  return response && 'data' in response && 'status' in response;
+}
+
+export default function Market({ id }: MarketProps) {
   const { values, handleChange, handleSubmit, resetForm, isSubmitting } =
     useForm({
       name: '',
@@ -35,50 +48,70 @@ export default function Market({ id }) {
       tags: '',
       content: '',
     });
-  const [product, setProduct] = useState([]);
-  const [comment, setComment] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [openComments, setOpenComments] = useState({});
-  // const [userData, setUserData] = useState({});
-  const [commentData, setCommentData] = useState({});
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [CheckModal, setCheckModal] = useState(false);
-  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
-  const [commentId, setCommentId] = useState();
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [openComments, setOpenComments] = useState<Record<number, boolean>>({});
+  const [commentData, setCommentData] = useState<string>('');
+  const [isProductModalOpen, setIsProductModalOpen] = useState<boolean>(false);
+  const [checkModal, setCheckModal] = useState<boolean>(false);
+  const [isCommentsModalOpen, setIsCommentsModalOpen] =
+    useState<boolean>(false);
+  const [commentId, setCommentId] = useState<string | undefined>();
   const [isProductDeleteModalOpen, setIsProductDeleteModalOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   const router = useRouter();
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await getProduct(id); // 비동기 API 호출
-        setProduct(response.data.product); // API 호출 후 데이터를 상태로 저장
-        // const profile = await getProfile(); // 비동기 함수 호출
-        // setUserData(profile); // 프로필 데이터를 상태로 저장
+
+        if (isAxiosResponse<Product>(response)) {
+          setProduct(response.data); // API 호출 후 데이터를 상태로 저장
+        } else {
+          // ErrorResponse일 경우의 처리
+          console.error(
+            '제품 정보를 가져오는 중 오류 발생:',
+            response?.response?.data?.message
+          );
+        }
       } catch (error) {
-        console.error('제품 정보를 가져오는 중 오류 발생:', error);
+        console.error('제품 정보를 가져오는 중 알 수 없는 오류 발생:', error);
       }
     };
 
     fetchProduct();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const response = await getComments(id, 9); // 비동기 API 호출
-        // console.log(response);
-        setComment(response); // API 호출 후 데이터의 data 부분만 상태로 저장
+
+        if (isAxiosResponse<Comment[]>(response)) {
+          // response가 AxiosResponse<Comment[]>인 경우
+          setComments(response.data);
+        } else {
+          // ErrorResponse인 경우 로그 출력 (선택 사항)
+          console.error(
+            '댓글을 가져오는 중 오류 발생:',
+            response?.response?.data?.message
+          );
+        }
       } catch (error) {
-        console.error('댓글 오류', error);
+        console.error('댓글을 가져오는 중 알 수 없는 오류 발생:', error);
       }
     };
 
     fetchComments();
-  }, []); // 처음 컴포넌트가 마운트될 때 한 번 실행
+  }, [id]);
 
-  const handleContentChange = (event) => {
+  const handleContentChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     setCommentData(event.target.value);
   };
 
@@ -91,18 +124,22 @@ export default function Market({ id }) {
   };
 
   const commentSubmitForm = async () => {
-    console.log(commentId, values.content);
     try {
-      const res = await patchComment(product.id, commentId, {
+      if (!commentId) return;
+      const res = await patchComment(commentId, {
         content: values.content,
       });
-      if (res && res.status === 200) {
-        resetForm();
-        console.log('수정 성공', res.data);
-        router.reload();
-        setIsCommentsModalOpen(false);
+      if (isAxiosResponse<Comment>(res)) {
+        if (res.status === 200) {
+          resetForm();
+          console.log('수정 성공', res.data);
+          router.reload();
+          setIsCommentsModalOpen(false);
+        } else {
+          console.log('수정 실패', res.data);
+        }
       } else {
-        console.log('수정 실패', res.data);
+        console.error('댓글 수정 중 오류 발생:', res?.response?.data?.message);
       }
     } catch (e) {
       console.log(e);
@@ -110,30 +147,39 @@ export default function Market({ id }) {
   };
 
   const submitForm = async () => {
+    if (!product) return;
+
     try {
       const res = await patchProduct(id, {
         name: values.name || product.name,
         description: values.description || product.description,
-        price: values.price || product.price,
-        tags: values.tags || product.tags,
+        price: values.price ? Number(values.price) : product.price,
+        tags: values.tags
+          ? values.tags.split(',').map((tag) => tag.trim())
+          : product.tags,
       });
-      if (res && res.status === 200) {
-        setIsProductModalOpen(false);
-        setCheckModal(true);
-        console.log('수정 성공', res.data);
-        resetForm();
-        router.reload();
+      if (isAxiosResponse<Product>(res)) {
+        if (res.status === 200) {
+          setIsProductModalOpen(false);
+          console.log('수정 성공', res.data);
+          resetForm();
+          router.reload();
+        } else {
+          console.log('수정 실패', res.data);
+        }
       } else {
-        console.log('수정 실패', res.data);
+        // res가 ErrorResponse인 경우 에러 메시지 로그
+        console.error('수정 실패', res);
       }
     } catch (e) {
-      console.log('에러', e);
+      console.error('에러', e);
     }
   };
-  const handleCommentToggle = (index) => {
+
+  const handleCommentToggle = (index: number) => {
     setOpenComments((prevState) => ({
       ...prevState,
-      [index]: !prevState[index], // 클릭된 인덱스의 상태만 토글
+      [index]: !prevState[index],
     }));
   };
 
@@ -174,27 +220,25 @@ export default function Market({ id }) {
       </Modal>
       <Modal
         isModalOpen={isCommentsModalOpen}
-        onClose={() => setIsProductModalOpen(false)}
+        onClose={() => setIsCommentsModalOpen(false)}
       >
         <form onSubmit={handleSubmit(commentSubmitForm)}>
           <p>댓글 수정</p>
-
           <p>댓글 내용</p>
           <textarea
             name="content"
             value={values.content}
             onChange={handleChange}
           ></textarea>
-
           <button>수정</button>
         </form>
       </Modal>
       <Modal
-        isModalOpen={CheckModal}
-        onClose={() => setCheckModal(!CheckModal)}
+        isModalOpen={checkModal}
+        onClose={() => setCheckModal(!checkModal)}
       >
         <p>성공 했습니다.</p>
-        <button onClick={() => setCheckModal(!CheckModal)}>확인</button>
+        <button onClick={() => setCheckModal(!checkModal)}>확인</button>
       </Modal>
       <Modal
         isModalOpen={isProductDeleteModalOpen}
@@ -232,19 +276,20 @@ export default function Market({ id }) {
                 alt="제품 이미지"
               />
             ) : (
-              <p>이미지를 불러오는 중...</p> // 제품 이미지가 없을 경우 처리
+              <p>이미지를 불러오는 중...</p>
             )}
           </div>
           <div className={styles.marketProductTitle}>
             <div className={styles.marketTitle}>
-              <p>{product.name}</p>
+              <p>{product?.name}</p>
               <Image
                 onClick={handletoggle}
                 src="/kebab-btn.svg"
                 width={24}
                 height={24}
                 className={styles.menuBtn}
-              ></Image>
+                alt="menu"
+              />
               {isOpen && (
                 <ul className={styles.menu}>
                   <li
@@ -253,46 +298,50 @@ export default function Market({ id }) {
                     수정 하기
                   </li>
 
-                  <li onClick={() => handleDelete(id)}>삭제 하기</li>
+                  <li onClick={() => handleDelete()}>삭제 하기</li>
                 </ul>
               )}
             </div>
             <div className={styles.marketPrice}>
-              {parseInt(product.price).toLocaleString() + '원'}
+              {(product?.price || 0) + '원'}
             </div>
             <div className={styles.marketContentName}>상품 소개</div>
-            <div className={styles.marketContent}>{product.description}</div>
+            <div className={styles.marketContent}>{product?.description}</div>
             <div className={styles.marketTagName}>상품태그</div>
             <div className={styles.marketTag}>
-              {product.tags && product.tags.length > 0 ? (
+              {product?.tags && product.tags.length > 0 ? (
                 product.tags.map((tag, index) => (
                   <p className={styles.tag} key={index}>
                     #{tag}
-                  </p> // 각 태그에 대해 p 태그 생성
+                  </p>
                 ))
               ) : (
                 <p>태그가 없습니다.</p>
               )}
             </div>
-
             <div className={styles.marketProfile}>
               <div className={styles.marketProfileContainer}>
                 <div>
-                  <Image src="/MyImg.svg" width={40} height={40}></Image>
+                  <Image src="/MyImg.svg" width={40} height={40} alt="myImg" />
                 </div>
                 <div>
-                  <p>{product.ownerNickname}</p>
-                  <p>{getTimeDifference(product.createdAt)}</p>
+                  {product ? (
+                    <>
+                      <h1>{product.name}</h1>
+                      <p>{product.description}</p>
+                    </>
+                  ) : (
+                    <p>Loading...</p>
+                  )}
                 </div>
               </div>
               <button
                 className={styles.favorite}
                 onClick={async () => {
-                  await postfavorite(product.id);
-                  // router.reload();
+                  await postfavorite(product?.id || '');
                 }}
               >
-                {'♡' + product.favoriteCount}
+                {'♡' + product?.favoriteCount}
               </button>
             </div>
           </div>
@@ -307,15 +356,13 @@ export default function Market({ id }) {
           <button
             className={styles.marketArticleBtn}
             onClick={async () => {
-              await postComment(product.id, { content: commentData });
-              // router.push(`/items/${product.id}`);
-              // router.reload();
+              await postComment(product?.id || '', { content: commentData });
             }}
           >
             등록
           </button>
           <div>
-            {comment.map((comment, index) => (
+            {comments.map((comment, index) => (
               <div key={index} className={styles.marketArticleContainer}>
                 <div className={styles.marketArticleContent}>
                   <p className={styles.marketArticleContentTitle}>
@@ -327,7 +374,8 @@ export default function Market({ id }) {
                     width={24}
                     height={24}
                     className={styles.commentMenu}
-                  ></Image>
+                    alt="menu"
+                  />
                   {openComments[index] && (
                     <ul className={styles.menu}>
                       <li
@@ -340,8 +388,7 @@ export default function Market({ id }) {
                       </li>
                       <li
                         onClick={async () => {
-                          await deleteComment(product.id, comment.id);
-                          console.log(comment.id);
+                          await deleteComment(comment.id);
                           router.reload();
                         }}
                       >
@@ -352,11 +399,16 @@ export default function Market({ id }) {
                 </div>
                 <div className={styles.marketArticleProfileContainer}>
                   <div>
-                    <Image src="/MyImg.svg" width={40} height={40} />{' '}
+                    <Image
+                      src="/MyImg.svg"
+                      width={40}
+                      height={40}
+                      alt="myImg"
+                    />
                   </div>
                   <div className={styles.marketArticleProfileInfo}>
                     <p className={styles.marketArticleProfileName}>
-                      {comment.user.nickName}
+                      {comment.nickname}
                     </p>{' '}
                     <p className={styles.marketArticleProfileDate}>
                       {getTimeDifference(comment.updatedAt)}

@@ -4,6 +4,7 @@ import {
   Article,
   ErrorResponse,
   GetArticlesParams,
+  PostArticleData,
 } from './types/articleTypes';
 const api = axios.create({
   baseURL: 'https://ms10-5yps.onrender.com',
@@ -45,13 +46,13 @@ export async function getArticles(
 
 export async function getArticleId(
   articleId: string,
-  data?: object
+  pageSize?: number
 ): Promise<AxiosResponse<{ article: Article }> | ErrorResponse> {
   try {
     const response = await api.get<{ article: Article }>(
       `/articles/${articleId}`,
       {
-        params: data,
+        params: pageSize,
       }
     );
     return response;
@@ -93,7 +94,7 @@ export async function deleteArticle(
 }
 
 export async function postArticle(
-  data: Omit<Article, 'id' | 'createdAt' | 'updatedAt'>
+  data: PostArticleData
 ): Promise<AxiosResponse<Article> | ErrorResponse> {
   try {
     const response = await api.post<Article>('/articles', data);
