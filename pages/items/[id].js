@@ -5,7 +5,7 @@ import {
   deleteProduct,
   patchProduct,
   postfavorite,
-} from '../api/products.ts';
+} from '../api/products';
 import { useEffect, useState } from 'react';
 import {
   getComments,

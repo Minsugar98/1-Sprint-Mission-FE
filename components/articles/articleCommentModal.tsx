@@ -1,30 +1,42 @@
-import styles from "./articleCommentModal.module.css";
-import Image from "next/image";
-import { useState } from "react";
-import { patchArticleComment } from "../../pages/api/comments";
-import { useRouter } from "next/router";
+import styles from './articleCommentModal.module.css';
+import Image from 'next/image';
+import { useState } from 'react';
+import { patchArticleComment } from '../../pages/api/comments';
+import { useRouter } from 'next/router';
 
-const CommentModal = ({ isOpen, closeModal, id, commentsId }) => {
+interface CommentModalProps {
+  isOpen: boolean;
+  closeModal: () => void;
+  id: string;
+  commentsId: string;
+}
+
+const CommentModal: React.FC<CommentModalProps> = ({
+  isOpen,
+  closeModal,
+  id,
+  commentsId,
+}) => {
   // commentsId prop 추가
-  const [btnState, setbtnState] = useState("commentBtnfalse");
-  const [content, setcontent] = useState("");
+  const [btnState, setbtnState] = useState<string>('commentBtnfalse');
+  const [content, setcontent] = useState<string>('');
   const router = useRouter();
 
   if (!isOpen) {
     return null; // 모달이 열려있지 않으면 아무것도 렌더링하지 않음
   }
 
-  const contentHandle = (e) => {
+  const contentHandle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setcontent(e.target.value);
     if (e.target.value.length > 0) {
       // content 대신 e.target.value 사용
-      setbtnState("addbtn");
+      setbtnState('addbtn');
     } else {
-      setbtnState("addbtnfalse");
+      setbtnState('addbtnfalse');
     }
   };
 
-  const patchClick = async (e) => {
+  const patchClick = async (e: React.FormEvent) => {
     e.preventDefault();
     const data = { content };
 
@@ -33,7 +45,7 @@ const CommentModal = ({ isOpen, closeModal, id, commentsId }) => {
       closeModal();
       router.reload(); // 페이지 새로고침
     } catch (e) {
-      console.log("댓글 수정 실패:", e);
+      console.log('댓글 수정 실패:', e);
     }
   };
 
@@ -54,12 +66,11 @@ const CommentModal = ({ isOpen, closeModal, id, commentsId }) => {
             <p>댓글 내용</p>
             <textarea
               className={styles.InputContent}
-              type="text"
               placeholder="수정할 내용을 입력해주세요"
               value={content} // value 설정
               onChange={contentHandle}
             ></textarea>
-            {btnState === "addbtn" ? (
+            {btnState === 'addbtn' ? (
               <button className={styles.addbtn}>수정</button>
             ) : (
               <button

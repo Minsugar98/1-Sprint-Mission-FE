@@ -1,8 +1,14 @@
-import { useEffect } from "react";
-import styles from "./modal.module.css";
-import Image from "next/image";
+import { useEffect } from 'react';
+import styles from './modal.module.css';
+import Image from 'next/image';
 
-export function Modal({ isModalOpen, onClose, children }) {
+interface ModalProps {
+  isModalOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+export function Modal({ isModalOpen, onClose, children }: ModalProps) {
   // 모달이 열리지 않으면 아무것도 렌더링하지 않음
   if (!isModalOpen) return null;
 
@@ -16,7 +22,7 @@ export function Modal({ isModalOpen, onClose, children }) {
           height={20}
           className={styles.closeImg}
           onClick={onClose}
-        ></Image>
+        />
         {children}
       </div>
     </div>

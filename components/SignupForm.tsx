@@ -3,8 +3,31 @@ import useForm from '../hook/form';
 import styles from './SignupForm.module.css';
 import Image from 'next/image';
 import { PostSignup } from '../pages/api/user';
+import { AxiosResponse } from 'axios';
+import { ErrorResponse } from '../pages/api/types/authTypes'; // 적절한 위치로 변경하세요
 
-const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
+function isAxiosResponse<T>(
+  response: AxiosResponse<T> | ErrorResponse
+): response is AxiosResponse<T> {
+  return (response as AxiosResponse<T>).status !== undefined;
+}
+
+interface SignupFormProps {
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+interface ValidationErrors {
+  email?: string;
+  password?: string;
+  password2?: string;
+  nickname?: string;
+}
+
+const SignupForm: React.FC<SignupFormProps> = ({
+  isModalOpen,
+  setIsModalOpen,
+}) => {
   const { values, handleChange, handleSubmit, resetForm, isSubmitting } =
     useForm({
       email: '',
@@ -13,18 +36,20 @@ const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
       password2: '',
     });
 
-  const [errors, setErrors] = useState({});
-  const [showpassword1, setShowpassword1] = useState(false);
-  const [showpassword2, setShowpassword2] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [showpassword1, setShowpassword1] = useState<boolean>(false);
+  const [showpassword2, setShowpassword2] = useState<boolean>(false);
+
   const passwordToggleHandler1 = () => {
-    setShowpassword1(!showpassword1);
-  };
-  const passwordToggleHandler2 = () => {
-    setShowpassword2(!showpassword2);
+    setShowpassword1((prev) => !prev);
   };
 
-  const validate = () => {
-    let validationErrors = {};
+  const passwordToggleHandler2 = () => {
+    setShowpassword2((prev) => !prev);
+  };
+
+  const validate = (): ValidationErrors => {
+    let validationErrors: ValidationErrors = {};
 
     if (!values.email) {
       validationErrors.email = '이메일을 입력해주세요.';
@@ -37,10 +62,11 @@ const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
     } else if (values.password.length < 8) {
       validationErrors.password = '비밀번호를 8자 이상 입력해주세요.';
     }
+
     if (values.password !== values.password2) {
-      validationErrors.password2 = '비밀번호를 입력해주세요.';
-    } else if (!values.password2) {
       validationErrors.password2 = '비밀번호가 일치하지 않습니다.';
+    } else if (!values.password2) {
+      validationErrors.password2 = '비밀번호를 입력해주세요.';
     }
 
     if (!values.nickname) {
@@ -57,18 +83,25 @@ const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      // console.log(values);
       try {
         const res = await PostSignup({
           email: values.email,
           password: values.password,
           nickname: values.nickname,
         });
-        if (res && res.status === 201) {
-          resetForm();
-          console.log('회원가입 성공', res.data);
+
+        if (isAxiosResponse(res)) {
+          // AxiosResponse인 경우만 처리
+          if (res.status === 201) {
+            resetForm();
+            console.log('회원가입 성공', res.data);
+          } else {
+            console.log('회원가입 실패', res.data);
+            setIsModalOpen(true);
+          }
         } else {
-          console.log('회원가입 실패', res.data);
+          // ErrorResponse인 경우 처리
+          console.error('회원가입 실패', res.response?.data.message);
           setIsModalOpen(true);
         }
       } catch (e) {
@@ -146,7 +179,7 @@ const SignupForm = ({ isModalOpen, setIsModalOpen }) => {
         {errors.password2 && <p className={styles.error}>{errors.password2}</p>}
       </div>
 
-      <button className={styles.button} type="submit">
+      <button className={styles.button} type="submit" disabled={isSubmitting}>
         회원가입
       </button>
     </form>

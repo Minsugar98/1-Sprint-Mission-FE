@@ -2,7 +2,7 @@ import styles from '../styles/signup.module.css';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { PostSignup } from './api/user';
-import SignupForm from '../components/SignupForm.js';
+import SignupForm from '../components/SignupForm';
 import { Modal } from '../components/modal';
 import { useRouter } from 'next/router';
 

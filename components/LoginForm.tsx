@@ -4,8 +4,14 @@ import styles from './LoginForm.module.css';
 import Image from 'next/image';
 import { PostLogin } from '../pages/api/user';
 import { useRouter } from 'next/router';
+import { ErrorResponse, AuthResponse } from '../pages/api/types/authTypes';
 
-const LoginForm = () => {
+interface ValidationErrors {
+  email?: string;
+  password?: string;
+}
+
+const LoginForm: React.FC = () => {
   const { values, handleChange, handleSubmit, resetForm, isSubmitting } =
     useForm({
       email: '',
@@ -13,16 +19,16 @@ const LoginForm = () => {
     });
 
   const router = useRouter();
-  const [errors, setErrors] = useState({});
-  const [showpassword, setShowpassword] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const passwordToggleHandler = () => {
-    setShowpassword(!showpassword);
+    setShowPassword(!showPassword);
   };
 
   // 유효성 검사 함수
-  const validate = () => {
-    let validationErrors = {};
+  const validate = (): ValidationErrors => {
+    let validationErrors: ValidationErrors = {};
 
     if (!values.email) {
       validationErrors.email = '이메일을 입력해주세요.';
@@ -45,21 +51,24 @@ const LoginForm = () => {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      // console.log(values.email, values.password);
       try {
         const res = await PostLogin({
           email: values.email,
           password: values.password,
         });
 
-        if (res && res.status === 200) {
+        // res가 AxiosResponse라면 res.data를 사용하여 접근합니다.
+        if ('data' in res && 'accessToken' in res.data) {
+          const data = res.data as AuthResponse;
+
           resetForm(); // 폼 리셋
-          console.log('로그인 성공', res.data);
-          localStorage.setItem('accessToken', res.data.accessToken);
-          localStorage.setItem('refreshToken', res.data.refreshToken);
+          console.log('로그인 성공', data);
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
           router.push('/market');
         } else {
-          console.log('로그인실패', res.data);
+          // ErrorResponse 처리
+          console.log('로그인 실패', res);
         }
       } catch (e) {
         console.log('에러', e);
@@ -83,14 +92,14 @@ const LoginForm = () => {
       <div className={styles.formGroup}>
         <label className={styles.label}>비밀번호</label>
         <input
-          type={showpassword ? 'text' : 'password'}
+          type={showPassword ? 'text' : 'password'}
           name="password"
           value={values.password}
           onChange={handleChange}
           className={styles.input}
         />
         <span className={styles.passwordToggle} onClick={passwordToggleHandler}>
-          {!showpassword ? (
+          {!showPassword ? (
             <Image src="./eyeClose.svg" alt="Close" width={24} height={24} />
           ) : (
             <Image src="./eyeOpen.svg" alt="open" width={24} height={24} />

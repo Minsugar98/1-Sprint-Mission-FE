@@ -4,25 +4,34 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { getProfile } from '../pages/api/user';
+import { UserProfile } from '../pages/api/types/authTypes'; // 사용 중인 UserProfile 타입 정의가 필요
+
 export default function Header() {
-  const [isLogin, setIsLogin] = useState(false);
-  const [userData, setUserData] = useState({});
+  const [isLogin, setIsLogin] = useState<boolean>(false);
+  const [userData, setUserData] = useState<UserProfile | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     // 비동기 함수 정의
     const fetchProfile = async () => {
-      const token = localStorage.getItem('accessToken');
       try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          setIsLogin(false);
+          return;
+        }
+
         const profile = await getProfile(); // 비동기 함수 실행
-        setUserData(profile); // 프로필 데이터를 저장
-        if (profile) {
+
+        if ('id' in profile) {
+          setUserData(profile); // 프로필 데이터를 저장
           setIsLogin(true); // 로그인 상태로 변경
         } else {
           setIsLogin(false); // 로그아웃 상태로 변경
         }
       } catch (error) {
         console.error('개인 정보를 가져오는 중 오류 발생:', error);
+        setIsLogin(false); // 오류 발생 시 로그인 상태 초기화
       }
     };
 
@@ -68,8 +77,8 @@ export default function Header() {
         </button>
       ) : (
         <div className={styles.loginSuccess}>
-          <Image src="/MyImg.svg" alt="profile" width={40} height={40}></Image>
-          <p>{userData.nickName}</p>
+          <Image src="/MyImg.svg" alt="profile" width={40} height={40} />
+          <p>{userData?.nickname}</p>
         </div>
       )}
     </div>

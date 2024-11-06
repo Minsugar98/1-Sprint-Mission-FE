@@ -1,35 +1,41 @@
-import styles from "./articleModal.module.css";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { patchArticle } from "../../pages/api/articles";
-import { useRouter } from "next/router";
+import styles from './articleModal.module.css';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { patchArticle } from '../../pages/api/articles';
+import { useRouter } from 'next/router';
 
-const Modal = ({ isOpen, closeModal, id }) => {
-  const [btnState, setbtnState] = useState("commentBtnfalse");
-  const [title, setTitle] = useState("");
-  const [content, setcontent] = useState("");
+interface ModalProps {
+  isOpen: boolean;
+  closeModal: () => void;
+  id: string;
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, closeModal, id }) => {
+  const [btnState, setbtnState] = useState('commentBtnfalse');
+  const [title, setTitle] = useState('');
+  const [content, setcontent] = useState('');
 
   const router = useRouter();
 
-  const titleHandle = (e) => {
+  const titleHandle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTitle(e.target.value);
     if (title.length > 0 && content.length > 0) {
-      setbtnState("addbtn");
+      setbtnState('addbtn');
     } else {
-      setbtnState("addbtnfalse");
+      setbtnState('addbtnfalse');
     }
   };
 
-  const contentHandle = (e) => {
+  const contentHandle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setcontent(e.target.value);
     if (title.length > 0 && content.length > 0) {
-      setbtnState("addbtn");
+      setbtnState('addbtn');
     } else {
-      setbtnState("addbtnfalse");
+      setbtnState('addbtnfalse');
     }
   };
 
-  const patchClick = async (e) => {
+  const patchClick = async (e: React.FormEvent) => {
     e.preventDefault();
     const data = {
       title: title,
@@ -56,6 +62,7 @@ const Modal = ({ isOpen, closeModal, id }) => {
             src="/deleteImg.svg"
             width={24}
             height={24}
+            alt="close"
           ></Image>
         </div>
         <div>
@@ -63,18 +70,16 @@ const Modal = ({ isOpen, closeModal, id }) => {
             <p>게시글 제목</p>
             <textarea
               className={styles.InputTitle}
-              type="text"
               placeholder="수정할 제목을 입력해주세요"
               onChange={titleHandle}
             ></textarea>
             <p>게시글 내용</p>
             <textarea
               className={styles.InputContent}
-              type="text"
               placeholder="수정할 내용을 입력해주세요"
               onChange={contentHandle}
             ></textarea>
-            {btnState === "addbtn" ? (
+            {btnState === 'addbtn' ? (
               <button className={styles.addbtn}>수정</button>
             ) : (
               <button
@@ -92,22 +97,3 @@ const Modal = ({ isOpen, closeModal, id }) => {
 };
 
 export default Modal;
-
-// 사용법
-// import Modal from "./component/modal.js";
-// const [isModalOpen, setIsModalOpen] = useState(false);
-//   const openModal = () => {
-//     setIsModalOpen(true);
-//   };
-//   const closeModal = () => {
-//     setIsModalOpen(false);
-//   };
-
-//<Modal isOpen={isModalOpen} closeModal={closeModal}>
-// <>
-// <div id="modal-title">
-//  <p>기업에 투자하기</p> // <- 여기에 내용 작성해서 CSS 설정하세요
-//  <div>투자 기업 정보</div> //  <- 여기에 내용 작성해서 CSS 설정하세요
-// </div>
-// </>
-//</Modal>

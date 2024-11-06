@@ -1,24 +1,24 @@
-import styles from "./id.module.css";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import styles from './id.module.css';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import {
   getArticleId,
   // postComment,
   deleteArticle,
   // deletecomment,
   postfavorite,
-} from "../api/articles";
+} from '../api/articles';
 
 import {
   postArticleComment,
   deleteArticleComment,
   patchArticleComment,
-} from "../api/comments";
-import { useRouter } from "next/router";
-import { formatDistanceToNow } from "date-fns";
-import { ko } from "date-fns/locale";
-import Modal from "../../components/articles/articleModal.js";
-import CommentModal from "../../components/articles/articleCommentModal.js";
+} from '../api/comments';
+import { useRouter } from 'next/router';
+import { formatDistanceToNow } from 'date-fns';
+import { ko } from 'date-fns/locale';
+import Modal from '../../components/articles/articleModal';
+import CommentModal from '../../components/articles/articleCommentModal';
 let pageSize = 3;
 export async function getServerSideProps(path) {
   const { id } = path.params;
@@ -37,21 +37,21 @@ export default function Post({ id }) {
   const [isOpen, setIsOpen] = useState(false);
   const [openComments, setOpenComments] = useState({});
   const [data, setData] = useState([]);
-  const [date, setDate] = useState(""); // 바로 추가하려고했으나 {.slice(0, 10)}에서 오류가 발생.. 이유 못찾음
-  const [commentContent, setCommentContent] = useState("");
+  const [date, setDate] = useState(''); // 바로 추가하려고했으나 {.slice(0, 10)}에서 오류가 발생.. 이유 못찾음
+  const [commentContent, setCommentContent] = useState('');
   const [commnetdata, setCommnetdata] = useState([]);
-  const [btnState, setbtnState] = useState("commentBtn");
+  const [btnState, setbtnState] = useState('commentBtn');
   const router = useRouter();
 
   const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     // 스크롤 이벤트 핸들러 추가
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
 
     return () => {
       // 컴포넌트 언마운트 시 스크롤 이벤트 핸들러 제거
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -70,12 +70,12 @@ export default function Post({ id }) {
 
     // 여기서 데이터를 로드하거나 API 호출 가능
     pageSize += 3;
-    console.log("데이터를 가져오는 중...");
+    console.log('데이터를 가져오는 중...');
     // console.log(pageSize);
 
     // 데이터 로드가 끝나면 isFetching 상태를 false로 설정
     setTimeout(() => {
-      console.log("데이터 로드 완료");
+      console.log('데이터 로드 완료');
       setIsFetching(false);
     }, 2000); // 임의의 지연 시간 추가
   }, [isFetching]);
@@ -103,7 +103,7 @@ export default function Post({ id }) {
 
     try {
       await postArticleComment(id, data);
-      setCommentContent("");
+      setCommentContent('');
       // router.reload();
     } catch (e) {
       console.log(e);
@@ -163,7 +163,7 @@ export default function Post({ id }) {
     if (res !== 500 || res !== 404) {
       // router.reload();
     } else {
-      console.log("error");
+      console.log('error');
     }
   };
   const handleComment = (e) => {
@@ -172,9 +172,9 @@ export default function Post({ id }) {
   };
   useEffect(() => {
     if (commentContent.length > 1) {
-      setbtnState("commentBtntrue");
+      setbtnState('commentBtntrue');
     } else {
-      setbtnState("commentBtn");
+      setbtnState('commentBtn');
     }
   }, [commentContent]);
 
@@ -245,7 +245,7 @@ export default function Post({ id }) {
                 placeholder="댓글을 입력해주세요"
               ></textarea>
 
-              {btnState === "commentBtn" ? (
+              {btnState === 'commentBtn' ? (
                 <button
                   className={styles[btnState]}
                   onClick={(e) => {
