@@ -20,6 +20,10 @@ const image_1 = __importDefault(require("next/image"));
 const react_1 = require("react");
 const articles_1 = require("./api/articles");
 const router_1 = require("next/router");
+// AxiosResponse 타입을 확인하는 타입 가드 함수 정의
+function isAxiosResponse(response) {
+    return response && response.data !== undefined;
+}
 let pageSize = 10;
 function Home() {
     const [isOpen, setIsOpen] = (0, react_1.useState)(false);
@@ -46,7 +50,6 @@ function Home() {
         if (!isFetching)
             return;
         pageSize += 3;
-        console.log('데이터를 가져오는 중...');
         // 추가 데이터 가져오기 로직 여기에 추가 가능
         // 데이터 로드가 끝나면 isFetching 상태를 false로 설정
         setIsFetching(false);
@@ -54,16 +57,27 @@ function Home() {
     const router = (0, router_1.useRouter)();
     const fetchBestArticles = () => __awaiter(this, void 0, void 0, function* () {
         try {
-            const data = yield (0, articles_1.getArticles)({
+            const response = yield (0, articles_1.getArticles)({
                 pageSize: 4,
             });
-            console.log(data);
-            if ('data' in data) {
-                setBestArticles(data.data);
+            if (isAxiosResponse(response)) {
+                const data = response.data;
+                // 데이터가 예상한 형태인지 확인하고 상태 업데이트
+                if (Array.isArray(data.articles)) {
+                    setBestArticles(data.articles);
+                }
+                else {
+                    setBestArticles([]);
+                }
+            }
+            else {
+                setBestArticles([]);
+                console.error('API 응답이 AxiosResponse가 아닙니다');
             }
         }
         catch (error) {
             console.error('베스트 게시글을 가져오는 중 오류 발생:', error);
+            setBestArticles([]);
         }
     });
     (0, react_1.useEffect)(() => {
@@ -77,24 +91,33 @@ function Home() {
     };
     const fetchContentArticles = () => __awaiter(this, void 0, void 0, function* () {
         try {
-            const data = yield (0, articles_1.getArticles)({
+            const response = yield (0, articles_1.getArticles)({
                 pageSize: pageSize,
                 keyword: keyword,
                 orderBy: value,
                 order: 'asc',
             });
-            console.log(data);
-            if ('data' in data) {
-                setArticleData(data.data);
+            if (isAxiosResponse(response)) {
+                const data = response.data;
+                // 데이터가 예상한 형태인지 확인하고 상태 업데이트
+                if (Array.isArray(data.articles)) {
+                    setArticleData(data.articles);
+                }
+                else {
+                    setArticleData([]);
+                }
+            }
+            else {
+                setArticleData([]);
             }
         }
         catch (error) {
-            console.error('게시글을 가져오는 중 오류 발생:', error);
+            setArticleData([]);
         }
     });
     (0, react_1.useEffect)(() => {
         fetchContentArticles();
-    }, [keyword, articleData]);
+    }, [keyword]);
     const handleToggle = () => {
         setIsOpen(!isOpen);
     };
@@ -115,7 +138,7 @@ function Home() {
             <p>베스트 게시글</p>
           </div>
           <div className={articles_module_css_1.default.BestItemContainer}>
-            {bestArticles.map((article) => (<BestItem_1.default key={article.id} article={article}/>))}
+            {bestArticles && bestArticles.length > 0 ? (bestArticles.map((article) => (<BestItem_1.default key={article.id} article={article}/>))) : (<p>베스트 게시글을 불러오고 있습니다...</p>)}
           </div>
 
           <div className={articles_module_css_1.default.ContentTitle}>

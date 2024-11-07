@@ -25,6 +25,8 @@ Content-Type: application/json
   "pageSize" : 4,
   "orderBy" : "favoriteCount"
 }
+### 상품 조회
+GET https://ms10-5yps.onrender.com/articles
 
 ### 유저 조회
 GET https://panda-market-api.vercel.app/users/me

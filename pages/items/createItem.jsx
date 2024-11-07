@@ -141,7 +141,6 @@ function CreateItem() {
             }
         }
         else {
-            console.log(validationErrors);
         }
     });
     return (<div className={createItem_module_css_1.default.container}>

@@ -181,13 +181,13 @@ export default function CreateItem() {
           }
         } else {
           // res가 ErrorResponse인 경우 에러 메시지 로그
+
           console.error('상품 등록 실패', res);
         }
       } catch (e) {
         console.error('에러 발생', e);
       }
     } else {
-      console.log(validationErrors);
     }
   };
 

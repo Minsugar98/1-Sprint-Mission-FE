@@ -6,7 +6,18 @@ import { useState, useEffect } from 'react';
 import { getArticles } from './api/articles';
 import { useRouter } from 'next/router';
 import { Article, Comment } from '../pages/api/types/articleTypes';
+import { AxiosResponse } from 'axios';
+
+// AxiosResponse 타입을 확인하는 타입 가드 함수 정의
+function isAxiosResponse<T>(response: any): response is AxiosResponse<T> {
+  return response && response.data !== undefined;
+}
 let pageSize = 10;
+
+interface GetArticlesResponse {
+  message: string;
+  articles: Article[];
+}
 export default function Home() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [dropdownValue, setDropdownValue] = useState<string>('최신 순');
@@ -39,7 +50,6 @@ export default function Home() {
     if (!isFetching) return;
 
     pageSize += 3;
-    console.log('데이터를 가져오는 중...');
     // 추가 데이터 가져오기 로직 여기에 추가 가능
 
     // 데이터 로드가 끝나면 isFetching 상태를 false로 설정
@@ -50,15 +60,26 @@ export default function Home() {
 
   const fetchBestArticles = async () => {
     try {
-      const data = await getArticles({
+      const response = await getArticles({
         pageSize: 4,
       });
-      console.log(data);
-      if ('data' in data) {
-        setBestArticles(data.data);
+
+      if (isAxiosResponse<GetArticlesResponse>(response)) {
+        const data = response.data;
+
+        // 데이터가 예상한 형태인지 확인하고 상태 업데이트
+        if (Array.isArray(data.articles)) {
+          setBestArticles(data.articles);
+        } else {
+          setBestArticles([]);
+        }
+      } else {
+        setBestArticles([]);
+        console.error('API 응답이 AxiosResponse가 아닙니다');
       }
     } catch (error) {
       console.error('베스트 게시글을 가져오는 중 오류 발생:', error);
+      setBestArticles([]);
     }
   };
 
@@ -76,24 +97,33 @@ export default function Home() {
 
   const fetchContentArticles = async () => {
     try {
-      const data = await getArticles({
+      const response = await getArticles({
         pageSize: pageSize,
         keyword: keyword,
         orderBy: value,
         order: 'asc',
       });
-      console.log(data);
-      if ('data' in data) {
-        setArticleData(data.data);
+
+      if (isAxiosResponse<GetArticlesResponse>(response)) {
+        const data = response.data;
+
+        // 데이터가 예상한 형태인지 확인하고 상태 업데이트
+        if (Array.isArray(data.articles)) {
+          setArticleData(data.articles);
+        } else {
+          setArticleData([]);
+        }
+      } else {
+        setArticleData([]);
       }
     } catch (error) {
-      console.error('게시글을 가져오는 중 오류 발생:', error);
+      setArticleData([]);
     }
   };
 
   useEffect(() => {
     fetchContentArticles();
-  }, [keyword, articleData]);
+  }, [keyword]);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -117,9 +147,13 @@ export default function Home() {
             <p>베스트 게시글</p>
           </div>
           <div className={styles.BestItemContainer}>
-            {bestArticles.map((article) => (
-              <BestItem key={article.id} article={article} />
-            ))}
+            {bestArticles && bestArticles.length > 0 ? (
+              bestArticles.map((article) => (
+                <BestItem key={article.id} article={article} />
+              ))
+            ) : (
+              <p>베스트 게시글을 불러오고 있습니다...</p>
+            )}
           </div>
 
           <div className={styles.ContentTitle}>

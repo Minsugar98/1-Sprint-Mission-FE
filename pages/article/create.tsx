@@ -92,7 +92,7 @@ export default function Create() {
 
     try {
       await postArticle(data);
-      // router.push(`/`);
+      router.push(`/`);
     } catch (e) {
       console.error(e);
     }

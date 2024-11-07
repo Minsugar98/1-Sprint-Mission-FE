@@ -34,7 +34,6 @@ export default function Market() {
 
         if (isAxiosResponse(response)) {
           setBestProducts(response.data.products);
-          console.log(response);
         } else {
           console.error('상품을 찾지 못했습니다.', response);
         }
@@ -57,7 +56,6 @@ export default function Market() {
 
         if (isAxiosResponse(response)) {
           setProducts(response.data.products);
-          console.log(response);
         } else {
           console.error('상품을 찾지 못했습니다.', response);
         }
@@ -85,7 +83,6 @@ export default function Market() {
 
           if (isAxiosResponse(response)) {
             setProducts(response.data.products);
-            console.log(response);
           } else {
             console.error('상품을 찾지 못했습니다.', response);
           }

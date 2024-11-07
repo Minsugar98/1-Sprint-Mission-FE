@@ -82,7 +82,7 @@ function Create() {
         };
         try {
             yield (0, articles_1.postArticle)(data);
-            // router.push(`/`);
+            router.push(`/`);
         }
         catch (e) {
             console.error(e);

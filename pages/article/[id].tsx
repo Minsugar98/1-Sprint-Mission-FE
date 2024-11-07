@@ -98,12 +98,9 @@ export default function Post({ id }: PostProps) {
 
     // 여기서 데이터를 로드하거나 API 호출 가능
     pageSize += 3;
-    console.log('데이터를 가져오는 중...');
-    // console.log(pageSize);
 
     // 데이터 로드가 끝나면 isFetching 상태를 false로 설정
     setTimeout(() => {
-      console.log('데이터 로드 완료');
       setIsFetching(false);
     }, 2000); // 임의의 지연 시간 추가
   }, [isFetching]);
@@ -186,7 +183,6 @@ export default function Post({ id }: PostProps) {
       [index]: !prevState[index],
     }));
     if ('status' in res && (res.status === 200 || res.status === 204)) {
-      console.log('댓글 삭제 완료');
       setOpenComments((prevState) => ({
         ...prevState,
         [index]: false,
