@@ -41,6 +41,7 @@ export async function getComments(
         params: { limit },
       }
     );
+    console.log(response);
     return response;
   } catch (error) {
     return isAxiosError(error)

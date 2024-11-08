@@ -11,27 +11,27 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, closeModal, id }) => {
-  const [btnState, setbtnState] = useState('commentBtnfalse');
+  const [btnState, setBtnState] = useState('commentBtnfalse');
   const [title, setTitle] = useState('');
-  const [content, setcontent] = useState('');
+  const [content, setContent] = useState('');
 
   const router = useRouter();
 
   const titleHandle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTitle(e.target.value);
     if (title.length > 0 && content.length > 0) {
-      setbtnState('addbtn');
+      setBtnState('addbtn');
     } else {
-      setbtnState('addbtnfalse');
+      setBtnState('addbtnfalse');
     }
   };
 
   const contentHandle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setcontent(e.target.value);
+    setContent(e.target.value);
     if (title.length > 0 && content.length > 0) {
-      setbtnState('addbtn');
+      setBtnState('addbtn');
     } else {
-      setbtnState('addbtnfalse');
+      setBtnState('addbtnfalse');
     }
   };
 

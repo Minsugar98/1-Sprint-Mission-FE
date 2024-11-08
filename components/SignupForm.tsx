@@ -37,15 +37,15 @@ const SignupForm: React.FC<SignupFormProps> = ({
     });
 
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [showpassword1, setShowpassword1] = useState<boolean>(false);
-  const [showpassword2, setShowpassword2] = useState<boolean>(false);
+  const [showPassword1, setShowPassword1] = useState<boolean>(false);
+  const [showPassword2, setShowPassword2] = useState<boolean>(false);
 
   const passwordToggleHandler1 = () => {
-    setShowpassword1((prev) => !prev);
+    setShowPassword1((prev) => !prev);
   };
 
   const passwordToggleHandler2 = () => {
-    setShowpassword2((prev) => !prev);
+    setShowPassword2((prev) => !prev);
   };
 
   const validate = (): ValidationErrors => {
@@ -138,7 +138,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
       <div className={styles.formGroup}>
         <label className={styles.label}>비밀번호</label>
         <input
-          type={showpassword1 ? 'text' : 'password'}
+          type={showPassword1 ? 'text' : 'password'}
           name="password"
           value={values.password}
           onChange={handleChange}
@@ -148,7 +148,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           className={styles.passwordToggle}
           onClick={passwordToggleHandler1}
         >
-          {!showpassword1 ? (
+          {!showPassword1 ? (
             <Image src="./eyeClose.svg" alt="Close" width={24} height={24} />
           ) : (
             <Image src="./eyeOpen.svg" alt="open" width={24} height={24} />
@@ -160,7 +160,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
       <div className={styles.formGroup}>
         <label className={styles.label}>비밀번호 확인</label>
         <input
-          type={showpassword2 ? 'text' : 'password'}
+          type={showPassword2 ? 'text' : 'password'}
           name="password2"
           value={values.password2}
           onChange={handleChange}
@@ -170,7 +170,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           className={styles.passwordToggle}
           onClick={passwordToggleHandler2}
         >
-          {!showpassword2 ? (
+          {!showPassword2 ? (
             <Image src="./eyeClose.svg" alt="Close" width={24} height={24} />
           ) : (
             <Image src="./eyeOpen.svg" alt="open" width={24} height={24} />

@@ -52,7 +52,9 @@ export async function getArticleId(
     const response = await api.get<{ article: Article }>(
       `/articles/${articleId}`,
       {
-        params: pageSize,
+        params: {
+          pageSize,
+        },
       }
     );
     return response;

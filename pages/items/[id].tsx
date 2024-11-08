@@ -69,14 +69,10 @@ export default function Market({ id }: MarketProps) {
       try {
         const response = await getProduct(id); // 비동기 API 호출
 
-        if (isAxiosResponse<Product>(response)) {
-          setProduct(response.data); // API 호출 후 데이터를 상태로 저장
+        if (isAxiosResponse<{ product: Product }>(response)) {
+          setProduct(response.data.product); // product 데이터를 올바르게 설정
         } else {
-          // ErrorResponse일 경우의 처리
-          console.error(
-            '제품 정보를 가져오는 중 오류 발생:',
-            response?.response?.data?.message
-          );
+          console.error('제품 정보를 가져오는 중 오류 발생:', response);
         }
       } catch (error) {
         console.error('제품 정보를 가져오는 중 알 수 없는 오류 발생:', error);
@@ -91,15 +87,13 @@ export default function Market({ id }: MarketProps) {
       try {
         const response = await getComments(id, 9); // 비동기 API 호출
 
-        if (isAxiosResponse<Comment[]>(response)) {
-          // response가 AxiosResponse<Comment[]>인 경우
-          setComments(response.data);
+        if (
+          isAxiosResponse<{ message: string; comments: Comment[] }>(response)
+        ) {
+          // response가 AxiosResponse<{ message: string; comments: Comment[] }>인 경우
+          setComments(response.data.comments); // `comments`에 접근해서 상태로 설정
         } else {
-          // ErrorResponse인 경우 로그 출력 (선택 사항)
-          console.error(
-            '댓글을 가져오는 중 오류 발생:',
-            response?.response?.data?.message
-          );
+          console.error('댓글을 가져오는 중 오류 발생:', response);
         }
       } catch (error) {
         console.error('댓글을 가져오는 중 알 수 없는 오류 발생:', error);
@@ -133,7 +127,7 @@ export default function Market({ id }: MarketProps) {
         if (res.status === 200) {
           resetForm();
           console.log('수정 성공', res.data);
-          router.reload();
+          router.push(`/items/${id}`);
           setIsCommentsModalOpen(false);
         } else {
           console.log('수정 실패', res.data);
@@ -150,14 +144,20 @@ export default function Market({ id }: MarketProps) {
     if (!product) return;
 
     try {
+      const tags = values.tags
+        ? values.tags
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean) // `filter(Boolean)`으로 undefined나 빈 문자열 필터링
+        : product.tags;
+
       const res = await patchProduct(id, {
         name: values.name || product.name,
         description: values.description || product.description,
         price: values.price ? Number(values.price) : product.price,
-        tags: values.tags
-          ? values.tags.split(',').map((tag) => tag.trim())
-          : product.tags,
+        tags: tags.length ? tags : product.tags, // `tags`가 비어 있으면 기존 태그 유지
       });
+
       if (isAxiosResponse<Product>(res)) {
         if (res.status === 200) {
           setIsProductModalOpen(false);
@@ -168,7 +168,6 @@ export default function Market({ id }: MarketProps) {
           console.log('수정 실패', res.data);
         }
       } else {
-        // res가 ErrorResponse인 경우 에러 메시지 로그
         console.error('수정 실패', res);
       }
     } catch (e) {
@@ -339,6 +338,7 @@ export default function Market({ id }: MarketProps) {
                 className={styles.favorite}
                 onClick={async () => {
                   await postfavorite(product?.id || '');
+                  router.reload();
                 }}
               >
                 {'♡' + product?.favoriteCount}
@@ -357,66 +357,71 @@ export default function Market({ id }: MarketProps) {
             className={styles.marketArticleBtn}
             onClick={async () => {
               await postComment(product?.id || '', { content: commentData });
+              router.reload();
             }}
           >
             등록
           </button>
           <div>
-            {comments.map((comment, index) => (
-              <div key={index} className={styles.marketArticleContainer}>
-                <div className={styles.marketArticleContent}>
-                  <p className={styles.marketArticleContentTitle}>
-                    {comment.content}
-                  </p>{' '}
-                  <Image
-                    onClick={() => handleCommentToggle(index)}
-                    src="/kebab-btn.svg"
-                    width={24}
-                    height={24}
-                    className={styles.commentMenu}
-                    alt="menu"
-                  />
-                  {openComments[index] && (
-                    <ul className={styles.menu}>
-                      <li
-                        onClick={() => {
-                          setCommentId(comment.id);
-                          setIsCommentsModalOpen(!isCommentsModalOpen);
-                        }}
-                      >
-                        수정 하기
-                      </li>
-                      <li
-                        onClick={async () => {
-                          await deleteComment(comment.id);
-                          router.reload();
-                        }}
-                      >
-                        삭제 하기
-                      </li>
-                    </ul>
-                  )}
-                </div>
-                <div className={styles.marketArticleProfileContainer}>
-                  <div>
+            {comments.length > 0 ? (
+              comments.map((comment, index) => (
+                <div key={index} className={styles.marketArticleContainer}>
+                  <div className={styles.marketArticleContent}>
+                    <p className={styles.marketArticleContentTitle}>
+                      {comment.content}
+                    </p>{' '}
                     <Image
-                      src="/MyImg.svg"
-                      width={40}
-                      height={40}
-                      alt="myImg"
+                      onClick={() => handleCommentToggle(index)}
+                      src="/kebab-btn.svg"
+                      width={24}
+                      height={24}
+                      className={styles.commentMenu}
+                      alt="menu"
                     />
+                    {openComments[index] && (
+                      <ul className={styles.menu}>
+                        <li
+                          onClick={() => {
+                            setCommentId(comment.id);
+                            setIsCommentsModalOpen(!isCommentsModalOpen);
+                          }}
+                        >
+                          수정 하기
+                        </li>
+                        <li
+                          onClick={async () => {
+                            await deleteComment(comment.id);
+                            router.reload();
+                          }}
+                        >
+                          삭제 하기
+                        </li>
+                      </ul>
+                    )}
                   </div>
-                  <div className={styles.marketArticleProfileInfo}>
-                    <p className={styles.marketArticleProfileName}>
-                      {comment.nickname}
-                    </p>{' '}
-                    <p className={styles.marketArticleProfileDate}>
-                      {getTimeDifference(comment.updatedAt)}
-                    </p>{' '}
+                  <div className={styles.marketArticleProfileContainer}>
+                    <div>
+                      <Image
+                        src="/MyImg.svg"
+                        width={40}
+                        height={40}
+                        alt="myImg"
+                      />
+                    </div>
+                    <div className={styles.marketArticleProfileInfo}>
+                      <p className={styles.marketArticleProfileName}>
+                        {comment.nickname}
+                      </p>{' '}
+                      <p className={styles.marketArticleProfileDate}>
+                        {getTimeDifference(comment.updatedAt)}
+                      </p>{' '}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>댓글이 없습니다.</p>
+            )}
           </div>
           <div className={styles.marketArticleFooter}>
             <button

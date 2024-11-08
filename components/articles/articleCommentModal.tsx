@@ -18,8 +18,8 @@ const CommentModal: React.FC<CommentModalProps> = ({
   commentsId,
 }) => {
   // commentsId prop 추가
-  const [btnState, setbtnState] = useState<string>('commentBtnfalse');
-  const [content, setcontent] = useState<string>('');
+  const [btnState, setBtnState] = useState<string>('commentBtnfalse');
+  const [content, setContent] = useState<string>('');
   const router = useRouter();
 
   if (!isOpen) {
@@ -27,12 +27,12 @@ const CommentModal: React.FC<CommentModalProps> = ({
   }
 
   const contentHandle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setcontent(e.target.value);
+    setContent(e.target.value);
     if (e.target.value.length > 0) {
       // content 대신 e.target.value 사용
-      setbtnState('addbtn');
+      setBtnState('addbtn');
     } else {
-      setbtnState('addbtnfalse');
+      setBtnState('addbtnfalse');
     }
   };
 

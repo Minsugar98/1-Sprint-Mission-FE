@@ -10,7 +10,7 @@ export interface ErrorResponse {
 // 코멘트 데이터 타입
 export interface Comment {
   id: string;
-  productId: string;
+  productId?: string;
   articleId?: string; // Article ID는 게시글 댓글에만 해당
   userId: string;
   nickname: string;
