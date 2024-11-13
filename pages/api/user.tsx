@@ -1,4 +1,8 @@
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import axios, {
+  AxiosResponse,
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import {
   SignupData,
   LoginData,
@@ -15,7 +19,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
-  (config) => {
+  (
+    config: InternalAxiosRequestConfig
+  ): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig> => {
     const token = localStorage.getItem('accessToken');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;

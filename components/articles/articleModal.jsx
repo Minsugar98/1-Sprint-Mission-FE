@@ -18,26 +18,26 @@ const react_1 = require("react");
 const articles_1 = require("../../pages/api/articles");
 const router_1 = require("next/router");
 const Modal = ({ isOpen, closeModal, id }) => {
-    const [btnState, setbtnState] = (0, react_1.useState)('commentBtnfalse');
+    const [btnState, setBtnState] = (0, react_1.useState)('commentBtnfalse');
     const [title, setTitle] = (0, react_1.useState)('');
-    const [content, setcontent] = (0, react_1.useState)('');
+    const [content, setContent] = (0, react_1.useState)('');
     const router = (0, router_1.useRouter)();
     const titleHandle = (e) => {
         setTitle(e.target.value);
         if (title.length > 0 && content.length > 0) {
-            setbtnState('addbtn');
+            setBtnState('addbtn');
         }
         else {
-            setbtnState('addbtnfalse');
+            setBtnState('addbtnfalse');
         }
     };
     const contentHandle = (e) => {
-        setcontent(e.target.value);
+        setContent(e.target.value);
         if (title.length > 0 && content.length > 0) {
-            setbtnState('addbtn');
+            setBtnState('addbtn');
         }
         else {
-            setbtnState('addbtnfalse');
+            setBtnState('addbtnfalse');
         }
     };
     const patchClick = (e) => __awaiter(void 0, void 0, void 0, function* () {

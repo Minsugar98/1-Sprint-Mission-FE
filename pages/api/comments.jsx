@@ -45,6 +45,7 @@ function getComments(productId, limit) {
             const response = yield api.get(`/products/product/${productId}/comments`, {
                 params: { limit },
             });
+            console.log(response);
             return response;
         }
         catch (error) {

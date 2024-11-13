@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AxiosResponse, AxiosError } from 'axios';
+import { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import {
   Article,
   ErrorResponse,
@@ -13,17 +13,20 @@ const api = axios.create({
   },
 });
 api.interceptors.request.use(
-  (config) => {
+  (
+    config: InternalAxiosRequestConfig
+  ): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig> => {
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
+  (error: AxiosError) => {
     return Promise.reject(error);
   }
 );
+
 function isAxiosError(error: any): error is AxiosError<ErrorResponse> {
   return error.isAxiosError;
 }

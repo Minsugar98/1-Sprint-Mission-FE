@@ -19,20 +19,20 @@ const comments_1 = require("../../pages/api/comments");
 const router_1 = require("next/router");
 const CommentModal = ({ isOpen, closeModal, id, commentsId, }) => {
     // commentsId prop 추가
-    const [btnState, setbtnState] = (0, react_1.useState)('commentBtnfalse');
-    const [content, setcontent] = (0, react_1.useState)('');
+    const [btnState, setBtnState] = (0, react_1.useState)('commentBtnfalse');
+    const [content, setContent] = (0, react_1.useState)('');
     const router = (0, router_1.useRouter)();
     if (!isOpen) {
         return null; // 모달이 열려있지 않으면 아무것도 렌더링하지 않음
     }
     const contentHandle = (e) => {
-        setcontent(e.target.value);
+        setContent(e.target.value);
         if (e.target.value.length > 0) {
             // content 대신 e.target.value 사용
-            setbtnState('addbtn');
+            setBtnState('addbtn');
         }
         else {
-            setbtnState('addbtnfalse');
+            setBtnState('addbtnfalse');
         }
     };
     const patchClick = (e) => __awaiter(void 0, void 0, void 0, function* () {

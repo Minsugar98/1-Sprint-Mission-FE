@@ -51,13 +51,13 @@ const SignupForm = ({ isModalOpen, setIsModalOpen, }) => {
         password2: '',
     });
     const [errors, setErrors] = (0, react_1.useState)({});
-    const [showpassword1, setShowpassword1] = (0, react_1.useState)(false);
-    const [showpassword2, setShowpassword2] = (0, react_1.useState)(false);
+    const [showPassword1, setShowPassword1] = (0, react_1.useState)(false);
+    const [showPassword2, setShowPassword2] = (0, react_1.useState)(false);
     const passwordToggleHandler1 = () => {
-        setShowpassword1((prev) => !prev);
+        setShowPassword1((prev) => !prev);
     };
     const passwordToggleHandler2 = () => {
-        setShowpassword2((prev) => !prev);
+        setShowPassword2((prev) => !prev);
     };
     const validate = () => {
         let validationErrors = {};
@@ -134,18 +134,18 @@ const SignupForm = ({ isModalOpen, setIsModalOpen, }) => {
       </div>
       <div className={SignupForm_module_css_1.default.formGroup}>
         <label className={SignupForm_module_css_1.default.label}>비밀번호</label>
-        <input type={showpassword1 ? 'text' : 'password'} name="password" value={values.password} onChange={handleChange} className={SignupForm_module_css_1.default.password1}/>
+        <input type={showPassword1 ? 'text' : 'password'} name="password" value={values.password} onChange={handleChange} className={SignupForm_module_css_1.default.password1}/>
         <span className={SignupForm_module_css_1.default.passwordToggle} onClick={passwordToggleHandler1}>
-          {!showpassword1 ? (<image_1.default src="./eyeClose.svg" alt="Close" width={24} height={24}/>) : (<image_1.default src="./eyeOpen.svg" alt="open" width={24} height={24}/>)}
+          {!showPassword1 ? (<image_1.default src="./eyeClose.svg" alt="Close" width={24} height={24}/>) : (<image_1.default src="./eyeOpen.svg" alt="open" width={24} height={24}/>)}
         </span>
 
         {errors.password && <p className={SignupForm_module_css_1.default.error}>{errors.password}</p>}
       </div>
       <div className={SignupForm_module_css_1.default.formGroup}>
         <label className={SignupForm_module_css_1.default.label}>비밀번호 확인</label>
-        <input type={showpassword2 ? 'text' : 'password'} name="password2" value={values.password2} onChange={handleChange} className={SignupForm_module_css_1.default.password2}/>
+        <input type={showPassword2 ? 'text' : 'password'} name="password2" value={values.password2} onChange={handleChange} className={SignupForm_module_css_1.default.password2}/>
         <span className={SignupForm_module_css_1.default.passwordToggle} onClick={passwordToggleHandler2}>
-          {!showpassword2 ? (<image_1.default src="./eyeClose.svg" alt="Close" width={24} height={24}/>) : (<image_1.default src="./eyeOpen.svg" alt="open" width={24} height={24}/>)}
+          {!showPassword2 ? (<image_1.default src="./eyeClose.svg" alt="Close" width={24} height={24}/>) : (<image_1.default src="./eyeOpen.svg" alt="open" width={24} height={24}/>)}
         </span>
         {errors.password2 && <p className={SignupForm_module_css_1.default.error}>{errors.password2}</p>}
       </div>
